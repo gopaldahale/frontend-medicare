@@ -6,17 +6,17 @@ const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) return <p>Loading...</p>;
-
-  // ✅ prevent crash
-  if (!user) return children;
-
-  if (user?.data?.user?.role === "patient") {
-    return <Navigate to="/patient-dashboard" />;
+ 
+  // ✅ If user is logged in → redirect
+  if (user) {
+    if (user.role === "patient") {
+      return <Navigate to="/patient-dashboard" replace />;
+    } else if (user.role === "doctor") {
+      return <Navigate to="/doctor-dashboard" replace />;
+    }
   }
-  else if (user?.data?.user?.role === "doctor") {
-    return <Navigate to="/doctor-dashboard" />;
-  }
 
+  // ✅ Not logged in → allow access
   return children;
 };
 

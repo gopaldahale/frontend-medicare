@@ -1,18 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"
+// import axios from "axios"
+import { axiosAuthAPI } from "../config/axios-instance";
 
 export const Register = () => {
-  // style
-  const FormClass = "bg-white p-6 rounded shadow-md w-80";
-  const h2Class = "text-2xl font-bold mb-4 text-center";
-  const inputClass = "w-full mb-3 p-2 border rounded";
-  const submitBtnClass = "w-full bg-gradient-to-br from-[#1a6fa8] to-[#38b2ac] text-white p-2 rounded hover:bg-blue-700";
-
   const navigate = useNavigate()
 
-  const [userData, setUserData] = useState({ username: '', email: '', password: '', role: 'patient' })
-  const { username, email, password, role } = userData
+  const [userData, setUserData] = useState({ username: '', email: '', password: '', role: 'patient', firstName: '', lastName: '' })
+  const { username, email, password, role, firstName, lastName } = userData
 
   const handleUserChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -26,7 +21,18 @@ export const Register = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/register', { username, password, email, role })
+      // const res = await axios.post('http://localhost:5000/api/auth/register', {
+      //   username, password, email, role, profile: {
+      //     firstName,
+      //     lastName
+      //   }
+      // })
+      const res = await axiosAuthAPI.post('/auth/register', {
+        username, password, email, role, profile: {
+          firstName,
+          lastName
+        }
+      })
 
       console.log(res)
 
@@ -41,15 +47,40 @@ export const Register = () => {
 
   }
   return (
-    <div className="flex justify-center items-center mt-20">
-      <form className={FormClass} onSubmit={handleRegisterSubmit} >
-        <h2 className={h2Class}>Register</h2>
+    <section className="page-container py-12 sm:py-16">
+      <div className="mx-auto max-w-2xl glass-card p-8">
+        <div className="mb-7 text-center">
+          <p className="text-sm font-medium uppercase tracking-[0.2em] text-sky-600">Create Account</p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Join Devi Ratna Hospital</h2>
+        </div>
+
+        <form className="space-y-4" onSubmit={handleRegisterSubmit} >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <input
+            type="text"
+            name="firstName"
+            placeholder="Enter firstname"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
+            value={firstName}
+            onChange={handleUserChange}
+          />
+
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Enter lastname"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
+            value={lastName}
+            onChange={handleUserChange}
+          />
+
+        </div>
 
         <input
           type="text"
           name="username"
           placeholder="Enter username"
-          className={inputClass}
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
           value={username}
           onChange={handleUserChange}
         />
@@ -58,24 +89,24 @@ export const Register = () => {
           type="email"
           name="email"
           placeholder="Enter email"
-          className={inputClass}
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
           value={email}
           onChange={handleUserChange}
 
         />
 
         <input
-          type="text"
+          type="password"
           name="password"
           placeholder="Enter password"
-          className={inputClass}
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
           value={password}
           onChange={handleUserChange}
 
         />
 
         <select
-          className={inputClass}
+          className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-sky-400 focus:outline-none"
           name="role"
           value={role}
           onChange={handleUserChange}
@@ -86,11 +117,12 @@ export const Register = () => {
 
         <button
           type="submit"
-          className={submitBtnClass}
+          className="w-full rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/30 transition hover:translate-y-[-1px]"
         >
           Register
         </button>
       </form>
-    </div>
+      </div>
+    </section>
   )
 }

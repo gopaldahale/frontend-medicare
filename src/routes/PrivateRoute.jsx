@@ -9,7 +9,7 @@ function PrivateRoutes({ children, role }) {
     if (!user) return <Navigate to="/login" />;
 
     if (role && user.role !== role) {
-        return <Navigate to="/" />; // or unauthorized page
+        return <Navigate to="/" replace />; // or unauthorized page
     }
 
     return children;

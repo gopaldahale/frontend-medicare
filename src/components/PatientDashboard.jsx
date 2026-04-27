@@ -1,49 +1,52 @@
-import React from 'react'
-import doctors from '../data/doctors'
+import React, { useEffect, useState } from 'react'
+// import doctors from '../data/doctors'
 import DoctorCard from './DoctorCard'
+// import axios from 'axios'
+import { axiosAuthAPI } from "../config/axios-instance";
+
+import { useDoctor } from '../context/AuthContext'
+
 
 const PatientDashboard = () => {
 
-  const handleBooking = (doctor) => {
+  const { doctors, fetchDoctor } = useDoctor();
+  const [myAppointments, setMyAppointments] = useState([]);
 
-    const currentUser = JSON.parse(localStorage.getItem("loggedInUser"))
+  useEffect(() => { fetchDoctor(); console.log(doctors) }, [])
 
-    const appointment = {
-      id: Date.now(),
-      patientName: currentUser.username,
-      patientEmail: currentUser.email,
-      doctorName: doctor.name,
-      doctorEmail: doctor.email,
-      specialization: doctor.specialization,
-      date: new Date().toLocaleString(),
-      status: "pending"
+  const fetchMyAppointments = async () => {
+    try {
+      // const res = await axios.get(
+      //   "http://localhost:5000/api/appointments/my",
+      //   { withCredentials: true }
+      // );
+      const res = await axiosAuthAPI.get(
+        "/appointments/my", 
+      );
+      setMyAppointments(res.data);
+    } catch (err) {
+      console.error(err);
     }
-    // Get existing appointments
-    const existing = JSON.parse(localStorage.getItem("appointments")) || [];
+  };
 
-    const existingAppointment = existing.find(
-      (user) => user.patientEmail == appointment.patientEmail && user.doctorEmail == appointment.doctorEmail
-    )
+  useEffect(() => {
+    fetchMyAppointments();
+  }, []);
 
-    if (existingAppointment) return (alert('Appointment already taken!'));
-
-    // Add new appointment
-    const updated = [...existing, appointment];
-
-    localStorage.setItem("appointments", JSON.stringify(updated))
-
-    alert("Appointment booked ✅");
-  }
 
   return (
-    <> Patient Dashboard
-      <div className='grid grid-cols-3 gap-6 w-max mx-auto my-10'>
-        {doctors.map((docData) =>
-          <DoctorCard key={docData.id} doctor={docData} handleBooking={handleBooking} />
-        )}
-
+    <section className="page-container py-10">
+      <div className="mb-8">
+        <h1 className="section-title">Patient Dashboard</h1>
+        <p className="section-subtitle">Find specialists and book appointments in a few clicks.</p>
       </div>
-    </>
+
+      <div className='grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+        {doctors.map((doctor) =>
+          <DoctorCard key={doctor._id} doctors={doctor} appointments={myAppointments} setMyAppointments={setMyAppointments} />
+        )}
+      </div>
+    </section>
   )
 }
 
