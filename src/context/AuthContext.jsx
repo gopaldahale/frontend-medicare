@@ -1,6 +1,7 @@
-import { createContext, useEffect, useContext, useState } from "react";
+import { createContext, useEffect, useContext, useState, useRef } from "react";
 import axios from 'axios'
 import { axiosAuthAPI } from "../config/axios-instance";
+
 
 const AuthContext = createContext();
 const DoctorContext = createContext();
@@ -61,12 +62,18 @@ export const DoctorProvider = ({ children }) => {
             setLoadingDoctors(false);
         }
     }
-
+    // const hasFetched = useRef(false)
+    // useEffect(() => {
+    //     if (user?.role === "patient" && !hasFetched.current) {
+    //         hasFetched.current = true;
+    //         fetchDoctor();
+    //     }
+    // }, [user]);
     useEffect(() => {
         if (user?.role === "patient") {
             fetchDoctor();
         }
-    }, [user]);
+    }, []);
 
     return (
         <DoctorContext.Provider value={{ doctors, loadingDoctors, fetchDoctor }}>{children}</DoctorContext.Provider>

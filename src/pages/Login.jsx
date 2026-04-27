@@ -24,11 +24,11 @@ const Login = () => {
     try {
       // 🔐 login → cookie set
       // await axios.post(`${apiurl}/login`, { email, password }, { withCredentials: true })
-      await axiosAuthAPI.post(`/login`, { email, password }, { withCredentials: true })
+      await axiosAuthAPI.post(`/auth/login`, { email, password }, { withCredentials: true })
 
       // 🔥 fetch current user after login
       // const userRes = await axios.get(`${apiurl}/me`, { withCredentials: true })
-      const userRes = await axiosAuthAPI.get(`/me`)
+      const userRes = await axiosAuthAPI.get(`/auth/me`)
       setUser(userRes.data.user);
 
       // await fetchDoctor();

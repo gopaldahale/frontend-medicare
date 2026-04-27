@@ -11,3 +11,4 @@ export const axiosAuthAPI = axios.create({
 export const axiosPublicAPI = axios.create({
     baseURL
 });
+ 
