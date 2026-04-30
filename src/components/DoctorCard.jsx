@@ -3,9 +3,10 @@ import BookingModal from './BookingModal';
 import avatarimg from '../assets/profileavatar.png'
 // import axios from 'axios';
 import { axiosAuthAPI } from "../config/axios-instance";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 
-const DoctorCard = ({ doctors, appointments, setMyAppointments }) => {
+const DoctorCard = ({ doctors, appointments, setMyAppointments, onFavoriteChange }) => {
     // style
     const styles = {
         card: `w-full max-w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white
@@ -31,6 +32,9 @@ const DoctorCard = ({ doctors, appointments, setMyAppointments }) => {
     const consultationFee = doctors.doctorInfo?.fee || doctors.doctorInfo?.consultationFee || "900";
     const rating = doctors.doctorInfo?.rating || "4.8";
     const nextAvailable = doctors.doctorInfo?.nextAvailable || "Today, 5:30 PM";
+    const isFavorite = Boolean(doctors.isFavorite);
+    const qualification = doctors.doctorInfo?.qualification?.join(", ") || "MBBS, MD";
+    const languages = doctors.doctorInfo?.languages?.join(", ") || "English, Nepali";
 
     const bookedAppointment = appointments?.find(
         (appt) =>
@@ -58,6 +62,15 @@ const DoctorCard = ({ doctors, appointments, setMyAppointments }) => {
                     appt._id === id ? { ...appt, status: "cancelled" } : appt
                 )
             );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        try {
+            const res = await axiosAuthAPI.patch(`/users/favorites/${doctors._id}`);
+            onFavoriteChange?.(doctors._id, res.data.isFavorite);
         } catch (error) {
             console.log(error);
         }
@@ -100,20 +113,52 @@ const DoctorCard = ({ doctors, appointments, setMyAppointments }) => {
                 <div className="mb-3 flex items-center gap-2">
                     <button
                         type="button"
-                        disabled
-                        className="w-full rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-500"
-                        title="Connect this with backend later"
+                        onClick={handleToggleFavorite}
+                        className={`w-full rounded-lg border px-2 py-2 text-xs font-medium transition ${isFavorite
+                            ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+                            : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                            }`}
                     >
-                        Save Doctor
+                        {isFavorite ? "Saved" : "Save Doctor"}
                     </button>
-                    <button
-                        type="button"
-                        disabled
-                        className="w-full rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-500"
-                        title="Connect this with backend later"
-                    >
-                        View Profile
-                    </button>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <button
+                                type="button"
+                                className="w-full rounded-lg border border-slate-200 px-2 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                            >
+                                View Profile
+                            </button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-lg rounded-2xl">
+                            <DialogHeader>
+                                <DialogTitle>Dr. {doctors.username}</DialogTitle>
+                                <DialogDescription>
+                                    {specialization} specialist profile and consultation details.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-3 text-sm text-slate-700">
+                                <div className="rounded-lg bg-slate-50 p-3">
+                                    <p className="text-xs text-slate-500">Qualification</p>
+                                    <p className="font-medium">{qualification}</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="rounded-lg bg-slate-50 p-3">
+                                        <p className="text-xs text-slate-500">Experience</p>
+                                        <p className="font-medium">{experience} years</p>
+                                    </div>
+                                    <div className="rounded-lg bg-slate-50 p-3">
+                                        <p className="text-xs text-slate-500">Consultation Fee</p>
+                                        <p className="font-medium">NPR {consultationFee}</p>
+                                    </div>
+                                </div>
+                                <div className="rounded-lg bg-slate-50 p-3">
+                                    <p className="text-xs text-slate-500">Languages</p>
+                                    <p className="font-medium">{languages}</p>
+                                </div>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 {bookedAppointment ? (

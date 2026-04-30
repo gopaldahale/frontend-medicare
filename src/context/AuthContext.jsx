@@ -1,5 +1,4 @@
-import { createContext, useEffect, useContext, useState, useRef } from "react";
-import axios from 'axios'
+import { createContext, useEffect, useContext, useState, useCallback } from "react";
 import { axiosAuthAPI } from "../config/axios-instance";
 
 
@@ -50,7 +49,7 @@ export const DoctorProvider = ({ children }) => {
     const { user } = useAuth();
     const [loadingDoctors, setLoadingDoctors] = useState(true)
 
-    const fetchDoctor = async () => {
+    const fetchDoctor = useCallback(async () => {
         try {
             // const res = await axios.get('http://localhost:5000/api/users/doctors')
             const res = await axiosAuthAPI.get('/users/doctors')
@@ -61,7 +60,7 @@ export const DoctorProvider = ({ children }) => {
         } finally {
             setLoadingDoctors(false);
         }
-    }
+    }, [])
     // const hasFetched = useRef(false)
     // useEffect(() => {
     //     if (user?.role === "patient" && !hasFetched.current) {
@@ -73,7 +72,7 @@ export const DoctorProvider = ({ children }) => {
         if (user?.role === "patient") {
             fetchDoctor();
         }
-    }, []);
+    }, [user, fetchDoctor]);
 
     return (
         <DoctorContext.Provider value={{ doctors, loadingDoctors, fetchDoctor }}>{children}</DoctorContext.Provider>
